@@ -1,18 +1,20 @@
 package ants;
 
-import java.util.List;
-
 public class Util {
 
-    public static String implode(List<String> a_list, String a_seperator) {
-        String value = "";
-        int length = a_list.size();
-        for(int i = 0; i < length; i++) {
-            if(i > 0) value += a_seperator;
-            value += a_list.get(i);
+    public static String implode(Iterable<String> list, String seperator) {
+        StringBuffer value = new StringBuffer();
+        
+        int i = 0;
+        for(String string : list) {
+            if(i > 0) {
+                value.append(seperator);
+            }
+            value.append(string);
+            i++;
         }
         
-        return value;
+        return value.toString();
     }
 
 }
