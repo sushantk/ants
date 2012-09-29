@@ -1,0 +1,10 @@
+{
+    "i1": {
+        "@class": "ants.test.ObjectFactoryTest$TestClass",
+        "requiredChild": ""
+    },
+    "i2": {
+        "@class": "ants.test.ObjectFactoryTest$TestClass",
+        "requiredChild": ""
+    }    
+}

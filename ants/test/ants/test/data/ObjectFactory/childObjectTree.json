@@ -1,0 +1,17 @@
+
+{
+    "requiredChild": "",
+    "notRequiredChild": "",
+    "childObject": {
+        "@class": "ants.test.ObjectFactoryTest$TestClass",
+        "requiredChild": ""
+    },
+    "childList": [
+        "i1",
+        "i2"
+    ],
+    "childMap": {
+        "i1": "v1",
+        "i2": "v2"
+    }
+}

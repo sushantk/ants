@@ -1,4 +1,4 @@
-package ants;
+package ants.api;
 
 public class Data {
 

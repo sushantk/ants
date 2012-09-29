@@ -4,10 +4,17 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ants.api.Task;
+
 /**
  * Provides foundation for task execution
  */
 public class TaskManager implements Task.AsyncMonitor {
+
+    static final Logger logger = LoggerFactory.getLogger(TaskManager.class);
 
     static ThreadPoolExecutor cpuTaskExecutor;
     static ThreadPoolExecutor syncIOTaskExecutor;
@@ -76,7 +83,7 @@ public class TaskManager implements Task.AsyncMonitor {
     }
 
     /**
-     * @see ants.Task.AsyncMonitor#onAsyncDataReady(ants.Task)
+     * @see ants.api.Task.AsyncMonitor#onAsyncDataReady(ants.api.Task)
      */
     @Override
     public void onAsyncDataReady(final Task task) {

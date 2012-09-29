@@ -1,4 +1,4 @@
-package ants;
+package ants.api;
 
 import java.util.LinkedList;
 
@@ -21,9 +21,13 @@ public abstract class Task {
 
     /**
      * Callback to send the task completion notification to one
-     * or more listeners
+     * or more listeners.
      */
     public interface Callback {
+        /**
+         * The listener can return one more tasks as a result to execute
+         * after the callback
+         */
         Iterable<Task> onComplete(Task task);
     }
 
@@ -75,7 +79,7 @@ public abstract class Task {
 
     public abstract Iterable<Task> run();
 
-    Iterable<Callback> getCallbacks() {
+    public Iterable<Callback> getCallbacks() {
         return this.callbacks;
     }
 
