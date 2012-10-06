@@ -8,8 +8,10 @@ public final class Const {
     }
 
     public static class attribute {
-        public static final String id = "@id";
-        public static final String klass = "@class";
+        public static final String nodeId = "@id";
+        public static final String nodeClass = "@class";
+        
+        public static final String name = "name";
     }
 
     public static final String comma = ",";

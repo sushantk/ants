@@ -1,10 +1,12 @@
 package ants;
 
+import ants.annotation.ConfigurableClass;
 import ants.annotation.ConfigurableMethod;
 import ants.api.Configurable;
 import ants.api.Context;
 import ants.api.IString;
 
+@ConfigurableClass(expectsValue=true)
 public class StringLiteral extends Configurable
                            implements IString {
 
@@ -22,5 +24,9 @@ public class StringLiteral extends Configurable
     @Override
     public String getValue(Context context) {
         return this.value;
-    }    
+    }
+    
+    public String toString() {
+        return this.value;
+    }
 }

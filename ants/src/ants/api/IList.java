@@ -2,7 +2,9 @@ package ants.api;
 
 import java.util.LinkedHashMap;
 
-public interface IList extends IConfigurable {
+import ants.exception.ObjectEvaluateException;
 
-    LinkedHashMap<String, IConfigurable> getItems(Context context);
+public interface IList {
+
+    LinkedHashMap<String, Configurable> getItems(Context context) throws ObjectEvaluateException;
 }

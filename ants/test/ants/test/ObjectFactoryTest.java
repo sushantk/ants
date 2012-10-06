@@ -1,29 +1,21 @@
 package ants.test;
 
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
-
-import junit.framework.TestListener;
 
 import org.junit.Test;
 
-import com.sun.corba.se.spi.orbutil.fsm.Input;
-
-import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
 import static org.junit.Assert.*;
 
 import ants.ObjectFactory;
 import ants.ObjectTree;
+import ants.ParamsDefault;
 import ants.StringDefault;
 import ants.annotation.ConfigurableClass;
 import ants.annotation.ConfigurableMethod;
 import ants.api.Configurable;
-import ants.api.IConfigurable;
-import ants.api.IList;
 import ants.exception.ObjectConfigureException;
 import ants.exception.ObjectCreateException;
 import ants.exception.ObjectIncompleteException;
@@ -67,14 +59,14 @@ public class ObjectFactoryTest {
             super(tagName, id);
         }
 
-        LinkedHashMap<String, IConfigurable> children;
+        LinkedHashMap<String, Configurable> children;
         
-        LinkedHashMap<String, IConfigurable> getChildren() {
+        LinkedHashMap<String, Configurable> getChildren() {
             return this.children;
         }
 
         @ConfigurableMethod(listItemTag="child")
-        public void setList(LinkedHashMap<String, IConfigurable> children) {
+        public void setList(LinkedHashMap<String, Configurable> children) {
             this.children = children;
         }        
     }
@@ -86,14 +78,14 @@ public class ObjectFactoryTest {
             super(tagName, id);
         }
 
-        LinkedHashMap<String, IConfigurable> children;
+        LinkedHashMap<String, Configurable> children;
         
-        LinkedHashMap<String, IConfigurable> getChildren() {
+        LinkedHashMap<String, Configurable> getChildren() {
             return this.children;
         }
 
         @ConfigurableMethod(listItemTag="param")
-        public void setList(LinkedHashMap<String, IConfigurable> children) {
+        public void setList(LinkedHashMap<String, Configurable> children) {
             this.children = children;
         }        
     }
@@ -104,61 +96,61 @@ public class ObjectFactoryTest {
             super(tagName, id);
         }
 
-        IConfigurable requiredChild;
-        IConfigurable notRequiredChild;
-        IConfigurable childObject;
-        IConfigurable childParams;
+        Configurable requiredChild;
+        Configurable notRequiredChild;
+        Configurable childObject;
+        Configurable childParams;
         TestList childList;
         TestParams childMap;
         
-        IConfigurable getRequiredChild() {
+        Configurable getRequiredChild() {
             return this.requiredChild;
         }
 
-        IConfigurable getNotRequiredChild() {
+        Configurable getNotRequiredChild() {
             return this.notRequiredChild;
         }
 
-        IConfigurable getChildObject() {
+        Configurable getChildObject() {
             return this.childObject;
         }
 
-        IConfigurable getChildParams() {
+        Configurable getChildParams() {
             return this.childParams;
         }
 
-        LinkedHashMap<String, IConfigurable> getChildList() {
+        LinkedHashMap<String, Configurable> getChildList() {
             return this.childList.getChildren();
         }
 
-        LinkedHashMap<String, IConfigurable> getChildMap() {
+        LinkedHashMap<String, Configurable> getChildMap() {
             return this.childMap.getChildren();
         }
 
         @ConfigurableMethod(required=true)
-        public void setRequiredChild(IConfigurable child) {
+        public void setRequiredChild(Configurable child) {
             this.requiredChild = child;
         }
         
-        public void setNotRequiredChild(IConfigurable child) {
+        public void setNotRequiredChild(Configurable child) {
             this.notRequiredChild = child;
         }
 
-        public void setChildObject(IConfigurable child) {
+        public void setChildObject(Configurable child) {
             this.childObject = child;
         }
 
-        public void setChildParams(IConfigurable child) {
+        public void setChildParams(Configurable child) {
             this.childParams = child;
         }
         
         @ConfigurableMethod(defaultClass="ants.test.ObjectFactoryTest$TestList", listItemTag="item")
-        public void setChildList(IConfigurable list) {
+        public void setChildList(Configurable list) {
             this.childList = (TestList)list;
         }
      
         @ConfigurableMethod(defaultClass="ants.test.ObjectFactoryTest$TestParams")
-        public void setChildMap(IConfigurable map) {
+        public void setChildMap(Configurable map) {
             this.childMap = (TestParams)map;
         }
     }
@@ -175,13 +167,11 @@ public class ObjectFactoryTest {
         assertEquals("Tag is populated", "test", testObject.getTag());
         assertEquals("Id is populated", "t1", testObject.getId());
         assertEquals("Required child should be a string", StringDefault.class, testObject.getRequiredChild().getClass());
-        assertEquals("Not required child should be a string", StringDefault.class, testObject.getNotRequiredChild().getClass());
+        assertEquals("Not required child should be a StringDefault", StringDefault.class, testObject.getNotRequiredChild().getClass());
         assertEquals("Child object should be of type TestClass", TestClass.class, testObject.getChildObject().getClass());
         assertEquals("Child list should be configured", 2, testObject.getChildList().size());
         assertEquals("Child map should be configured", 2, testObject.getChildMap().size());
-        
-        // test params
-        
+        assertEquals("Child params should be ParamsDefault", ParamsDefault.class, testObject.getChildParams().getClass());
     }
     
     @Test
@@ -207,12 +197,12 @@ public class ObjectFactoryTest {
         
         TestList testList = (TestList)factory.configure(tree, TestList.class.getName(), "params", "", "", "child");
         
-        LinkedHashMap<String, IConfigurable> children = testList.getChildren();
+        LinkedHashMap<String, Configurable> children = testList.getChildren();
         assertEquals("Params have a list of children", 2, children.size());
-        Iterator<IConfigurable> collection = children.values().iterator();
+        Iterator<Configurable> collection = children.values().iterator();
         
-        IConfigurable first = collection.next();
-        IConfigurable second = collection.next();
+        Configurable first = collection.next();
+        Configurable second = collection.next();
         
         assertEquals("First children is a string", StringDefault.class, first.getClass());
         assertEquals("Child tag is set", "child", first.getTag());
@@ -230,12 +220,12 @@ public class ObjectFactoryTest {
         
         TestParams testParams = (TestParams)factory.configure(tree, TestParams.class.getName(), "params", "", "", "testParam");
 
-        LinkedHashMap<String, IConfigurable> children = testParams.getChildren();
+        LinkedHashMap<String, Configurable> children = testParams.getChildren();
         assertEquals("Params have a list of children", 2, children.size());
-        Iterator<IConfigurable> collection = children.values().iterator();        
+        Iterator<Configurable> collection = children.values().iterator();        
         
-        IConfigurable first = collection.next();
-        IConfigurable second = collection.next();
+        Configurable first = collection.next();
+        Configurable second = collection.next();
         
         assertEquals("Child tag is set", "testParam", first.getTag());
         assertEquals("Child tag is set", "testParam", second.getTag());

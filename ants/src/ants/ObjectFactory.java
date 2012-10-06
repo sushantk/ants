@@ -10,7 +10,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.HashSet;
 import java.util.Set;
@@ -27,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import ants.annotation.ConfigurableClass;
 import ants.annotation.ConfigurableMethod;
-import ants.api.IConfigurable;
+import ants.api.Configurable;
 import ants.exception.ObjectConfigureException;
 import ants.exception.ObjectCreateException;
 import ants.exception.ObjectIncompleteException;
@@ -80,7 +79,7 @@ public class ObjectFactory {
      * 
      * @throws ObjectConfigureException
      */
-    public IConfigurable configure(ObjectTree tree, String defaultClass,
+    public Configurable configure(ObjectTree tree, String defaultClass,
             String tagName, String id, String defaultListItemClass,
             String listItemTag) throws ObjectConfigureException {
         Stack<String> tagStack = new Stack<String>();
@@ -118,7 +117,7 @@ public class ObjectFactory {
      * Internal method to create and configure the object recursively with the
      * given node
      */
-    private IConfigurable configure(JsonNode node,
+    private Configurable configure(JsonNode node,
             String defaultClass, String tagName, String id,
             String defaultListItemClass, String listItemTag,
             Stack<String> tagStack)
@@ -127,9 +126,9 @@ public class ObjectFactory {
             IllegalAccessException, InvocationTargetException,
             ClassNotFoundException, InstantiationException {
         
-        IConfigurable object = ObjectFactory.create(node, defaultClass,
+        Configurable object = ObjectFactory.create(node, defaultClass,
                 tagName, id);
-        tagStack.push(ObjectFactory.toString(object));
+        tagStack.push(object.toTagString());
         
         logger.debug("Configuring node: {}", tagStack.peek());
         Class<?> klass = object.getClass();
@@ -151,7 +150,7 @@ public class ObjectFactory {
      * Internal method to configure the object recursively with the given node's
      * children, treating them as child objects
      */
-    private void configureWithObjects(IConfigurable object, ObjectNode node,
+    private void configureWithObjects(Configurable object, ObjectNode node,
             Stack<String> tagStack) throws ObjectCreateException,
             ObjectIncompleteException, SecurityException,
             IllegalArgumentException, NoSuchMethodException,
@@ -160,35 +159,46 @@ public class ObjectFactory {
         HashSet<String> setMethods = new HashSet<String>();
 
         Class<?> klass = object.getClass();
+        ConfigurableClass kannotation = klass.getAnnotation(ConfigurableClass.class);
+        boolean expectsValue = (null == kannotation ? false : kannotation.expectsValue());
         Iterator<Entry<String, JsonNode>> it = node.getFields();
         while (it.hasNext()) {
             Entry<String, JsonNode> entry = it.next();
             String childTagName = entry.getKey();
+            JsonNode childNode = entry.getValue();
+            
+            // attributes
             if (childTagName.startsWith("@")) {
-                continue; // attributes
-                // TODO: set attribute on parent
+                object.setAttribute(childTagName.substring(1), childNode.asText()); 
+                continue;
             }
 
             String setMethodName = Const.set
                     + childTagName.substring(0, 1).toUpperCase()
                     + childTagName.substring(1);
-            Method method = klass.getMethod(setMethodName, IConfigurable.class);
-            ConfigurableMethod annotation = method
+            Method method;
+            if(expectsValue) {
+                method = klass.getMethod(setMethodName, String.class);
+                method.invoke(object, childNode.asText());
+            } else {
+                method = klass.getMethod(setMethodName, Configurable.class);
+                ConfigurableMethod mannotation = method
                     .getAnnotation(ConfigurableMethod.class);
             
-            String defaultClass = "";
-            String defaultListItemClass = "";
-            String listItemTag = "";
-            if(null != annotation) {
-                defaultClass = annotation.defaultClass();
-                defaultListItemClass = annotation.defaultListItemClass();
-                listItemTag = annotation.listItemTag();
+                String defaultClass = "";
+                String defaultListItemClass = "";
+                String listItemTag = "";
+                if(null != mannotation) {
+                    defaultClass = mannotation.defaultClass();
+                    defaultListItemClass = mannotation.defaultListItemClass();
+                    listItemTag = mannotation.listItemTag();
+                }
+    
+                Configurable childObject = this.configure(childNode,
+                            defaultClass, childTagName, "",
+                            defaultListItemClass, listItemTag, tagStack);
+                method.invoke(object, childObject);
             }
-
-            IConfigurable childObject = this.configure(entry.getValue(),
-                        defaultClass, childTagName, "",
-                        defaultListItemClass, listItemTag, tagStack);
-            method.invoke(object, childObject);
 
             setMethods.add(setMethodName);
         }
@@ -200,7 +210,7 @@ public class ObjectFactory {
      * Internal method to configure the object recursively with the given node's
      * children treating them as a list of child objects
      */
-    private void configureWithList(IConfigurable object, JsonNode node,
+    private void configureWithList(Configurable object, JsonNode node,
             String defaultListItemClass, String listItemTag,
             Stack<String> tagStack)
             throws ObjectCreateException, ObjectIncompleteException,
@@ -209,18 +219,23 @@ public class ObjectFactory {
             ClassNotFoundException, InstantiationException {
         Class<?> klass = object.getClass();
         Method method = klass.getMethod(Const.setList, LinkedHashMap.class);
-        ConfigurableMethod annotation = method
-                .getAnnotation(ConfigurableMethod.class);
         
-        if(listItemTag.isEmpty()) {
-            listItemTag = annotation.listItemTag();
+        ConfigurableMethod mannotation = method
+                .getAnnotation(ConfigurableMethod.class);
+        if(null != mannotation) {
+            if(listItemTag.isEmpty()) {
+                listItemTag = mannotation.listItemTag();
+            }
+            if(defaultListItemClass.isEmpty()) {
+                defaultListItemClass = mannotation.defaultListItemClass();
+            }
         }
 
-        LinkedHashMap<String, IConfigurable> childList = new LinkedHashMap<String, IConfigurable>();
+        LinkedHashMap<String, Configurable> childList = new LinkedHashMap<String, Configurable>();
         if (node.isArray()) {
             Iterator<JsonNode> it = node.getElements();
             while (it.hasNext()) {
-                IConfigurable childObject = this.configure(it.next(),
+                Configurable childObject = this.configure(it.next(),
                         defaultListItemClass, listItemTag, "", "", "", tagStack);
                 childList.put(childObject.getId(), childObject);
             }
@@ -229,12 +244,15 @@ public class ObjectFactory {
             while (it.hasNext()) {
                 Entry<String, JsonNode> entry = it.next();
                 String childId = entry.getKey();
+                JsonNode childNode = entry.getValue();
+
+                // attributes
                 if (childId.startsWith("@")) {
-                    continue; // attribute of the parent object
-                    // TODO: set it on parent
+                    object.setAttribute(childId.substring(1), childNode.asText()); 
+                    continue;
                 }
 
-                IConfigurable childObject = this.configure(entry.getValue(),
+                Configurable childObject = this.configure(childNode,
                         defaultListItemClass, listItemTag, childId, "", "", tagStack);
                 childList.put(childObject.getId(), childObject);
             }
@@ -247,18 +265,18 @@ public class ObjectFactory {
      * Verifies if all required parameters are set on an object after it is
      * configured
      */
-    private static void verify(IConfigurable object, Set<String> setMethods)
+    private static void verify(Configurable object, Set<String> setMethods)
             throws ObjectIncompleteException {
         ArrayList<String> missingParams = new ArrayList<String>();
 
         Class<?> klass = object.getClass();
         Method[] methods = klass.getMethods();
         for (Method method : methods) {
-            ConfigurableMethod annotation = method
+            ConfigurableMethod mannotation = method
                     .getAnnotation(ConfigurableMethod.class);
-            if (null != annotation) {
+            if (null != mannotation) {
                 String methodName = method.getName();
-                boolean required = annotation.required();
+                boolean required = mannotation.required();
                 if (required && !setMethods.contains(methodName)) {
                     missingParams.add(methodName.substring(3).toLowerCase());
                 }
@@ -273,17 +291,17 @@ public class ObjectFactory {
     }
 
     /**
-     * instantiate an IConfigurable object using the class name specified in the
+     * instantiate an Configurable object using the class name specified in the
      * JsonNode or the provided default class name.
      */
-    private static IConfigurable create(JsonNode node, String defaultClass,
+    private static Configurable create(JsonNode node, String defaultClass,
             String tagName, String id) throws ObjectCreateException,
             ClassNotFoundException, SecurityException, NoSuchMethodException,
             IllegalArgumentException, InstantiationException,
             IllegalAccessException, InvocationTargetException {
         String className = defaultClass;
         if (node.isObject()) {
-            JsonNode classNode = node.get(Const.attribute.klass);
+            JsonNode classNode = node.get(Const.attribute.nodeClass);
             if (null != classNode) {
                 className = classNode.asText();
             }
@@ -297,7 +315,7 @@ public class ObjectFactory {
         }
 
         if (id.isEmpty()) {
-            JsonNode idNode = node.get(Const.attribute.id);
+            JsonNode idNode = node.get(Const.attribute.nodeId);
             if (null != idNode) {
                 id = idNode.asText();
             }
@@ -309,15 +327,6 @@ public class ObjectFactory {
         Class<?> klass = Class.forName(className);
         Constructor<?> tc = klass.getConstructor(String.class, String.class);
         Object t = tc.newInstance(tagName, id);
-        return (IConfigurable) t;
+        return (Configurable) t;
     }
-
-    /**
-     * return a string representation of an IConfigurable object for debugging
-     */
-    private static String toString(IConfigurable object) {
-        return object.getTag() + "<" + object.getClass().getName() + ", "
-                + object.getId() + ">";
-    }
-
 }

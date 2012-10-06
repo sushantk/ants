@@ -6,4 +6,5 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ConfigurableClass {
     boolean expectsList() default false;
+    boolean expectsValue() default false;
 }

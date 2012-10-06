@@ -1,0 +1,8 @@
+{
+    "n1": "v1",
+    "n2": {
+        "@class": "ants.ParamsDefault",
+        "n21": "v21",
+        "n22": "v22"
+    }
+}

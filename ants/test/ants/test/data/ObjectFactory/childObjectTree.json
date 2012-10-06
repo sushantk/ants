@@ -13,5 +13,9 @@
     "childMap": {
         "i1": "v1",
         "i2": "v2"
+    },
+    "childParams": {
+        "i1": "v1",
+        "i2": "v2"
     }
 }
