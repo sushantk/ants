@@ -7,7 +7,7 @@ import org.codehaus.jackson.JsonNode;
  */
 public final class ObjectTree {
 
-    JsonNode node;
+    private JsonNode node;
 
     public ObjectTree(JsonNode node) {
         this.node = node;

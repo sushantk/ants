@@ -4,5 +4,5 @@ import ants.exception.ObjectEvaluateException;
 
 public interface IString {
     
-    String getValue(Context context)  throws ObjectEvaluateException;
+    String getValue(ExecuteContext context)  throws ObjectEvaluateException;
 }

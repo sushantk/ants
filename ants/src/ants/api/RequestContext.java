@@ -1,7 +1,17 @@
 package ants.api;
 
-public class RequestContext {
+import java.util.LinkedHashMap;
 
-    public RequestContext() {
-    }    
+import ants.api.IParams.Type;
+
+public class RequestContext extends Context {
+
+    public RequestContext(LinkedHashMap<String, Type> params) {
+        super(null, params);
+    }
+
+    public boolean isLogging() {
+        // TODO: use filters
+        return true;
+    }
 }

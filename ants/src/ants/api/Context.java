@@ -1,40 +1,26 @@
 package ants.api;
 
-public class Context {
-    private boolean logging;
+import java.util.LinkedHashMap;
 
-    private RequestContext requestContext;
-    
-    private String iid;
-    private String moduleId;
+import ants.api.IParams.Type;
 
-    public Context(RequestContext requestContext, String iid, String moduleId) {
-        this.requestContext = requestContext;
+public abstract class Context {
 
-        this.iid = iid;
-        this.moduleId = moduleId;
-        
-        //TODO: Use request context to check filters
-        this.logging = true;
+    private Context parent;    
+    private LinkedHashMap<String, Type> params;
+
+    public Context(Context parent, LinkedHashMap<String, Type> params) {
+        this.parent = parent;
+        this.params = params;
     }
 
-    public RequestContext getRequestContext() {
-        return this.requestContext;
-    }
-    
-    public String getInstanceId() {
-        return this.iid;
+    public Context getParent() {
+        return this.parent;
     }
 
-    public String getModuleId() {
-        return this.moduleId;
+    public Type get(String key) {
+        return (null == this.params ? null : this.params.get(key));
     }
     
-    public boolean isLogging() {
-        return this.logging;
-    }
-    
-    public String toString() {
-        return "Context<" + this.moduleId + ", " + this.iid + ">";
-    }
+    public abstract boolean isLogging();
 }

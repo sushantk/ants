@@ -12,12 +12,12 @@ import ants.api.Task;
 /**
  * Provides foundation for task execution
  */
-public class TaskManager implements Task.AsyncMonitor {
+public class TaskExecutor implements Task.AsyncMonitor {
 
-    static final Logger logger = LoggerFactory.getLogger(TaskManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskExecutor.class);
 
-    static ThreadPoolExecutor cpuTaskExecutor;
-    static ThreadPoolExecutor syncIOTaskExecutor;
+    private static ThreadPoolExecutor cpuTaskExecutor;
+    private static ThreadPoolExecutor syncIOTaskExecutor;
 
     /*
      * One time configuration to tune thread pools as per the need and system
@@ -32,7 +32,7 @@ public class TaskManager implements Task.AsyncMonitor {
                 new LinkedBlockingQueue<Runnable>(cpuTaskPoolSize));
         cpuTaskExecutor.allowCoreThreadTimeOut(false);
         cpuTaskExecutor.prestartAllCoreThreads();
-        TaskManager.cpuTaskExecutor = cpuTaskExecutor;
+        TaskExecutor.cpuTaskExecutor = cpuTaskExecutor;
 
         // sync io tasks have a fixed size thread pool with an unbounded queue.
         // threads start and grow up to the pool size as per the need and also
@@ -42,21 +42,21 @@ public class TaskManager implements Task.AsyncMonitor {
                 TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(
                         syncIOTaskPoolSize));
         syncIOTaskExecutor.allowCoreThreadTimeOut(false);
-        TaskManager.syncIOTaskExecutor = syncIOTaskExecutor;
+        TaskExecutor.syncIOTaskExecutor = syncIOTaskExecutor;
     }
 
     boolean logging;
 
-    public TaskManager(boolean logging) {
+    public TaskExecutor(boolean logging) {
         this.logging = logging;
     }
 
     public void run(final Task task) {
-        final TaskManager self = this;
+        final TaskExecutor self = this;
 
         switch (task.getType()) {
         case CPU: {
-            TaskManager.cpuTaskExecutor.submit(new Runnable() {
+            TaskExecutor.cpuTaskExecutor.submit(new Runnable() {
                 @Override
                 public void run() {
                     Iterable<Task> next = task.run();
@@ -66,7 +66,7 @@ public class TaskManager implements Task.AsyncMonitor {
         }
             break;
         case SYNC_IO: {
-            TaskManager.syncIOTaskExecutor.submit(new Runnable() {
+            TaskExecutor.syncIOTaskExecutor.submit(new Runnable() {
                 @Override
                 public void run() {
                     Iterable<Task> next = task.run();

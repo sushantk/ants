@@ -8,13 +8,21 @@ import ants.exception.ObjectEvaluateException;
 
 public interface IParams {
 
-    public static abstract class SimpleOrComplex {
-        abstract public String getSimple();
+    public static abstract class Type {
+        public String getSimple() {
+            return null;
+        }
 
-        abstract public LinkedHashMap<String, SimpleOrComplex> getComplex();
+        public LinkedHashMap<String, Type> getComplex() {
+            return null;
+        }
+        
+        public Object getCustom() {
+            return null;
+        }
     }
     
-    public static class Simple extends SimpleOrComplex {
+    public static class Simple extends Type {
         String string;
 
         public Simple(String string) {
@@ -26,20 +34,15 @@ public interface IParams {
             return string;
         }
 
-        @Override
-        public LinkedHashMap<String, SimpleOrComplex> getComplex() {
-            return null;
-        }
-        
         public String toString() {
             return this.string;
         }
     }
 
-    public static class Complex extends SimpleOrComplex {
-        LinkedHashMap<String, SimpleOrComplex> complex;
+    public static class Complex extends Type {
+        LinkedHashMap<String, Type> complex;
 
-        public Complex(LinkedHashMap<String, SimpleOrComplex> complex) {
+        public Complex(LinkedHashMap<String, Type> complex) {
             this.complex = complex;
         }
 
@@ -53,7 +56,7 @@ public interface IParams {
         }
 
         @Override
-        public LinkedHashMap<String, SimpleOrComplex> getComplex() {
+        public LinkedHashMap<String, Type> getComplex() {
             return complex;
         }
         
@@ -62,6 +65,18 @@ public interface IParams {
         }
     }
 
-    LinkedHashMap<String, SimpleOrComplex> getPairs(Context context,
+    public static class Custom extends Type {
+        Object object;
+
+        public Custom(Object object) {
+            this.object = object;
+        }
+        
+        public String toString() {
+            return (null == this.object ? null : this.object.toString());
+        }
+    }
+
+    LinkedHashMap<String, Type> getPairs(ExecuteContext context,
             boolean simple) throws ObjectEvaluateException;
 }

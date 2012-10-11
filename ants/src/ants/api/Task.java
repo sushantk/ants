@@ -34,18 +34,12 @@ public abstract class Task {
     private Type type;
     private Status status = Status.NOT_DONE;
     private Result result = Result.FAILED;
-    private Object userData;
     private Data data;
 
     private LinkedList<Callback> callbacks = new LinkedList<Callback>();
 
-    public Task(Type type, Object userData) {
-        this.userData = userData;
+    public Task(Type type) {
         this.type = type;
-    }
-
-    public Object getUserData() {
-        return this.userData;
     }
 
     public Type getType() {
@@ -88,7 +82,7 @@ public abstract class Task {
     }
 
     public String toString() {
-        return "Task<" + userData + ">";
+        return "Task<" + this.type + ">";
     }
 
     /**

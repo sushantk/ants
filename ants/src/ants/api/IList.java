@@ -6,5 +6,6 @@ import ants.exception.ObjectEvaluateException;
 
 public interface IList {
 
-    LinkedHashMap<String, Configurable> getItems(Context context) throws ObjectEvaluateException;
+    LinkedHashMap<String, Configurable> getItems(ExecuteContext context)
+            throws ObjectEvaluateException;
 }

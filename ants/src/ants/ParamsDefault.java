@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import ants.annotation.ConfigurableClass;
 import ants.annotation.ConfigurableMethod;
 import ants.api.Configurable;
-import ants.api.Context;
+import ants.api.ExecuteContext;
 import ants.api.IParams;
 import ants.api.IString;
 import ants.exception.ObjectEvaluateException;
@@ -23,7 +23,7 @@ public class ParamsDefault extends Configurable
                            implements IParams {
     static final Logger logger = LoggerFactory.getLogger(ParamsDefault.class);
     
-    LinkedHashMap<String, Configurable> params;
+    private LinkedHashMap<String, Configurable> params;
 
     public ParamsDefault(String tagName, String id) {
         super(tagName, id);
@@ -35,9 +35,9 @@ public class ParamsDefault extends Configurable
     }
 
     @Override
-    public LinkedHashMap<String, SimpleOrComplex> getPairs(Context context,
+    public LinkedHashMap<String, Type> getPairs(ExecuteContext context,
             boolean simple) throws ObjectEvaluateException {
-        LinkedHashMap<String, SimpleOrComplex> result = new  LinkedHashMap<String, SimpleOrComplex>();
+        LinkedHashMap<String, Type> result = new  LinkedHashMap<String, Type>();
         
         Iterator<Entry<String, Configurable>> iter = this.params.entrySet().iterator();
         while(iter.hasNext()) {
@@ -55,9 +55,9 @@ public class ParamsDefault extends Configurable
                 if(simple) {
                     result.put(name, new Simple(string));
                 } else {
-                    SimpleOrComplex value = result.get(name);
+                    Type value = result.get(name);
                     if(null == value) {
-                        value = new Complex(new LinkedHashMap<String, SimpleOrComplex>());
+                        value = new Complex(new LinkedHashMap<String, Type>());
                         result.put(name, value);
                     }
                     value.getComplex().put(configurable.getId(), new Simple(string));
