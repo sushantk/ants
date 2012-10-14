@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import ants.exception.ObjectEvaluateException;
+import ants.exception.EvaluateException;
 
 public interface IParams {
 
@@ -78,5 +78,5 @@ public interface IParams {
     }
 
     LinkedHashMap<String, Type> getPairs(ExecuteContext context,
-            boolean simple) throws ObjectEvaluateException;
+            boolean simple) throws EvaluateException;
 }

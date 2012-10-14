@@ -13,7 +13,7 @@ import ants.api.Configurable;
 import ants.api.ExecuteContext;
 import ants.api.IParams;
 import ants.api.IString;
-import ants.exception.ObjectEvaluateException;
+import ants.exception.EvaluateException;
 
 /**
  * 
@@ -36,7 +36,7 @@ public class ParamsDefault extends Configurable
 
     @Override
     public LinkedHashMap<String, Type> getPairs(ExecuteContext context,
-            boolean simple) throws ObjectEvaluateException {
+            boolean simple) throws EvaluateException {
         LinkedHashMap<String, Type> result = new  LinkedHashMap<String, Type>();
         
         Iterator<Entry<String, Configurable>> iter = this.params.entrySet().iterator();
@@ -68,7 +68,7 @@ public class ParamsDefault extends Configurable
                 result.put(name, new Complex(iparams.getPairs(context, false)));
             }
             else {
-                throw new ObjectEvaluateException("Invalid parameter type, string, list or map expected: " + name, 
+                throw new EvaluateException("Invalid parameter type, string, list or map expected: " + name, 
                         context, this);
             }
         }

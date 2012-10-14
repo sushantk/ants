@@ -6,29 +6,28 @@ import java.io.InputStream;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
+import org.codehaus.jackson.JsonNode;
 import org.junit.Test;
 
 import ants.ObjectFactory;
-import ants.ObjectTree;
 import ants.ParamsDefault;
-import ants.api.Context;
 import ants.api.IParams.Type;
 import ants.api.ExecuteContext;
 import ants.exception.ObjectConfigureException;
-import ants.exception.ObjectEvaluateException;
-import ants.exception.ObjectParseException;
+import ants.exception.EvaluateException;
+import ants.exception.ParseException;
+import ants.test.stub.TestExecuteContext;
 
 public class ParamsDefaultTest {
 
     @Test
-    public void testSimple() throws ObjectParseException, ObjectConfigureException, ObjectEvaluateException {
+    public void testSimple() throws ParseException, ObjectConfigureException, EvaluateException {
         String jsonFile = "data/ParamsDefault/simple.json";
         InputStream is = this.getClass().getResourceAsStream(jsonFile);
-        ObjectFactory factory = new ObjectFactory();
-        ObjectTree tree = factory.parse(jsonFile, is);
+        JsonNode tree = ObjectFactory.parse(jsonFile, is);
         
-        ExecuteContext context = Util.createExecuteContext();
-        ParamsDefault params = (ParamsDefault)factory.configure(tree, ParamsDefault.class.getName(), "", "", "", "");
+        ExecuteContext context = new TestExecuteContext();
+        ParamsDefault params = (ParamsDefault)ObjectFactory.configure(tree, ParamsDefault.class.getName(), "", "", "", "");
         LinkedHashMap<String, Type> result = params.getPairs(context, true);
         assertEquals("Simple params size", 2, result.size());
         assertEquals("Simple params name value", "v1", result.get("n1").getSimple());
@@ -36,14 +35,13 @@ public class ParamsDefaultTest {
     }
 
     @Test
-    public void testSimpleOrder() throws ObjectParseException, ObjectConfigureException, ObjectEvaluateException {
+    public void testSimpleOrder() throws ParseException, ObjectConfigureException, EvaluateException {
         String jsonFile = "data/ParamsDefault/simpleArray.json";
         InputStream is = this.getClass().getResourceAsStream(jsonFile);
-        ObjectFactory factory = new ObjectFactory();
-        ObjectTree tree = factory.parse(jsonFile, is);
+        JsonNode tree = ObjectFactory.parse(jsonFile, is);
         
-        ExecuteContext context = Util.createExecuteContext();
-        ParamsDefault params = (ParamsDefault)factory.configure(tree, ParamsDefault.class.getName(), "", "", "", "");
+        ExecuteContext context = new TestExecuteContext();
+        ParamsDefault params = (ParamsDefault)ObjectFactory.configure(tree, ParamsDefault.class.getName(), "", "", "", "");
         LinkedHashMap<String, Type> result = params.getPairs(context, true);
         assertEquals("Simple params size", 3, result.size());
         
@@ -59,18 +57,17 @@ public class ParamsDefaultTest {
     }
     
     @Test
-    public void testComplexAsSimple() throws ObjectParseException, ObjectConfigureException {
+    public void testComplexAsSimple() throws ParseException, ObjectConfigureException {
         String jsonFile = "data/ParamsDefault/complex.json";
         InputStream is = this.getClass().getResourceAsStream(jsonFile);
-        ObjectFactory factory = new ObjectFactory();
-        ObjectTree tree = factory.parse(jsonFile, is);
+        JsonNode tree = ObjectFactory.parse(jsonFile, is);
         
-        ExecuteContext context = Util.createExecuteContext();
-        ParamsDefault params = (ParamsDefault)factory.configure(tree, ParamsDefault.class.getName(), "", "", "", "");
+        ExecuteContext context = new TestExecuteContext();
+        ParamsDefault params = (ParamsDefault)ObjectFactory.configure(tree, ParamsDefault.class.getName(), "", "", "", "");
         boolean failed = false;
         try {
             params.getPairs(context, true);
-        } catch(ObjectEvaluateException e) {
+        } catch(EvaluateException e) {
             failed = true;
         }
         
@@ -78,14 +75,13 @@ public class ParamsDefaultTest {
     }
     
     @Test
-    public void testComplex() throws ObjectParseException, ObjectConfigureException, ObjectEvaluateException {
+    public void testComplex() throws ParseException, ObjectConfigureException, EvaluateException {
         String jsonFile = "data/ParamsDefault/complex.json";
         InputStream is = this.getClass().getResourceAsStream(jsonFile);
-        ObjectFactory factory = new ObjectFactory();
-        ObjectTree tree = factory.parse(jsonFile, is);
+        JsonNode tree = ObjectFactory.parse(jsonFile, is);
         
-        ExecuteContext context = Util.createExecuteContext();
-        ParamsDefault params = (ParamsDefault)factory.configure(tree, ParamsDefault.class.getName(), "", "", "", "");
+        ExecuteContext context = new TestExecuteContext();
+        ParamsDefault params = (ParamsDefault)ObjectFactory.configure(tree, ParamsDefault.class.getName(), "", "", "", "");
         LinkedHashMap<String, Type> result = params.getPairs(context, false);
         System.out.println(result);
         
@@ -100,14 +96,14 @@ public class ParamsDefaultTest {
     }
     
     @Test
-    public void testMultiValue() throws ObjectParseException, ObjectConfigureException, ObjectEvaluateException {
+    public void testMultiValue() throws ParseException, ObjectConfigureException, EvaluateException {
         String jsonFile = "data/ParamsDefault/multivalue.json";
         InputStream is = this.getClass().getResourceAsStream(jsonFile);
         ObjectFactory factory = new ObjectFactory();
-        ObjectTree tree = factory.parse(jsonFile, is);
+        JsonNode tree = ObjectFactory.parse(jsonFile, is);
         
-        ExecuteContext context = Util.createExecuteContext();
-        ParamsDefault params = (ParamsDefault)factory.configure(tree, ParamsDefault.class.getName(), "", "", "", "");
+        ExecuteContext context = new TestExecuteContext();
+        ParamsDefault params = (ParamsDefault)ObjectFactory.configure(tree, ParamsDefault.class.getName(), "", "", "", "");
         LinkedHashMap<String, Type> result = params.getPairs(context, false);
 
         assertEquals("Simple params size", 1, result.size());
@@ -119,14 +115,13 @@ public class ParamsDefaultTest {
     }
 
     @Test
-    public void testMultiValueArray() throws ObjectParseException, ObjectConfigureException, ObjectEvaluateException {
+    public void testMultiValueArray() throws ParseException, ObjectConfigureException, EvaluateException {
         String jsonFile = "data/ParamsDefault/multivalueArray.json";
         InputStream is = this.getClass().getResourceAsStream(jsonFile);
-        ObjectFactory factory = new ObjectFactory();
-        ObjectTree tree = factory.parse(jsonFile, is);
+        JsonNode tree = ObjectFactory.parse(jsonFile, is);
         
-        ExecuteContext context = Util.createExecuteContext();
-        ParamsDefault params = (ParamsDefault)factory.configure(tree, ParamsDefault.class.getName(), "", "", "", "");
+        ExecuteContext context = new TestExecuteContext();
+        ParamsDefault params = (ParamsDefault)ObjectFactory.configure(tree, ParamsDefault.class.getName(), "", "", "", "");
         LinkedHashMap<String, Type> result = params.getPairs(context, false);
 
         assertEquals("Simple params size", 1, result.size());

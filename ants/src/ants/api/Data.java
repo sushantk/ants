@@ -2,19 +2,19 @@ package ants.api;
 
 public class Data {
 
-    private byte[] bytes;
+    private Object dataObject;
     private String mimeType;
     
-    public Data(byte[] bytes, String mimeType) {
-        this.bytes = bytes;
+    public Data(Object dataObject, String mimeType) {
+        this.dataObject = dataObject;
         this.mimeType = mimeType;
     }
 
-    byte[] getBytes() {
-        return this.bytes;
+    public Object getObject() {
+        return this.dataObject;
     }
 
-    String getMimeType() {
+    public String getMimeType() {
         return this.mimeType;
     }
 }

@@ -1,5 +1,6 @@
 package ants;
 
+import java.util.Collection;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -12,9 +13,10 @@ import ants.api.Task;
 /**
  * Provides foundation for task execution
  */
-public class TaskExecutor implements Task.AsyncMonitor {
+public class TaskExecutor implements Task.Monitor {
 
-    private static final Logger logger = LoggerFactory.getLogger(TaskExecutor.class);
+    private static final Logger logger = LoggerFactory
+            .getLogger(TaskExecutor.class);
 
     private static ThreadPoolExecutor cpuTaskExecutor;
     private static ThreadPoolExecutor syncIOTaskExecutor;
@@ -25,7 +27,7 @@ public class TaskExecutor implements Task.AsyncMonitor {
      */
     public static void configure(int cpuTaskPoolSize, int syncIOTaskPoolSize) {
         // cpu tasks have a fixed size pre-started thread pool with an unbounded
-        // queue. it is recommended that the pool size be a little more than the 
+        // queue. it is recommended that the pool size be a little more than the
         // number of available cores in the system
         ThreadPoolExecutor cpuTaskExecutor = new ThreadPoolExecutor(
                 cpuTaskPoolSize, cpuTaskPoolSize, 0, TimeUnit.MILLISECONDS,
@@ -51,16 +53,18 @@ public class TaskExecutor implements Task.AsyncMonitor {
         this.logging = logging;
     }
 
-    public void run(final Task task) {
-        final TaskExecutor self = this;
+    public void queue(final Task task) {
+        logger.debug("Queue task: {}: ", task);
 
+        task.setMonitor(this);
+
+        final TaskExecutor self = this;
         switch (task.getType()) {
         case CPU: {
             TaskExecutor.cpuTaskExecutor.submit(new Runnable() {
                 @Override
                 public void run() {
-                    Iterable<Task> next = task.run();
-                    self.complete(task, next);
+                    self.run(task);
                 }
             });
         }
@@ -69,48 +73,51 @@ public class TaskExecutor implements Task.AsyncMonitor {
             TaskExecutor.syncIOTaskExecutor.submit(new Runnable() {
                 @Override
                 public void run() {
-                    Iterable<Task> next = task.run();
-                    self.complete(task, next);
+                    self.run(task);
                 }
             });
         }
             break;
         case ASYNC_IO: {
-            task.setAsyncMonitor(this);
+            // async tasks don't need a managed thread pool, they should have
+            // their own pool as required
+            self.run(task);
         }
             break;
         }
     }
 
     /**
-     * @see ants.api.Task.AsyncMonitor#onAsyncDataReady(ants.api.Task)
+     * @see ants.api.Task.Monitor#onReady(ants.api.Task, Collection<Task> next)
      */
     @Override
-    public void onAsyncDataReady(final Task task) {
-        // thread pool is not used to run the async io task, as it is already
-        // done fetching data. it is supposedly going to advice for any further
-        // activity via returned tasks
-        Iterable<Task> next = task.run();
-        this.complete(task, next);
+    public void onDone(Task task, Collection<Task> next) {
+        logger.trace("Task done: {}, next: ", task, next);
+        this.runNext(next);
     }
 
     /**
-     * finalize the task after completing its run
+     * run a task and the set of tasks collected as a result
      */
-    private void complete(Task task, Iterable<Task> nextTasks) {
-        // run the new set of tasks returned by the completed task
-        for (Task next : nextTasks) {
-            this.run(next);
-        }
+    private void run(final Task task) {
+        logger.debug("Running task: {}: ", task);
 
-        // notify the callbacks and run the new set of tasks returned
-        // by the callback
-        Iterable<Task.Callback> callbacks = task.getCallbacks();
-        for (Task.Callback callback : callbacks) {
-            Iterable<Task> cbNextTasks = callback.onComplete(task);
-            for (Task next : cbNextTasks) {
-                this.run(next);
-            }
+        try {
+            Collection<Task> next = task.run();
+            this.runNext(next);
+        } catch(Exception e) {
+            // Catching all exceptions for error reporting
+            logger.error("Failed to run task: " + task, e);
         }
     }
+
+    /**
+     * Run a set of tasks returned as a result of previous activities
+     */
+    private void runNext(Collection<Task> next) {
+        for (Task task : next) {
+            this.queue(task);
+        }
+    }
+
 }

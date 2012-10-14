@@ -14,11 +14,11 @@ public class StringDefault extends Configurable
                            implements IString {
     private static final Logger logger = LoggerFactory.getLogger(StringDefault.class);
 
+    private String value;
+
     public StringDefault(String tagName, String id) {
         super(tagName, id);
     }
-    
-    private String value;
 
     @ConfigurableMethod(required=true)
     public void setValue(String value) {

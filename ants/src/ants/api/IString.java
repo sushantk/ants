@@ -1,8 +1,8 @@
 package ants.api;
 
-import ants.exception.ObjectEvaluateException;
+import ants.exception.EvaluateException;
 
 public interface IString {
     
-    String getValue(ExecuteContext context)  throws ObjectEvaluateException;
+    String getValue(ExecuteContext context)  throws EvaluateException;
 }

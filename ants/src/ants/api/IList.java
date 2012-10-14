@@ -2,10 +2,10 @@ package ants.api;
 
 import java.util.LinkedHashMap;
 
-import ants.exception.ObjectEvaluateException;
+import ants.exception.EvaluateException;
 
 public interface IList {
 
     LinkedHashMap<String, Configurable> getItems(ExecuteContext context)
-            throws ObjectEvaluateException;
+            throws EvaluateException;
 }

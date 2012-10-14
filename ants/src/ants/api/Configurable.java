@@ -36,4 +36,9 @@ public abstract class Configurable {
         return this.getTag() + "<" + this.getClass().getName() + ", "
                 + this.getId() + ">";
     }
+    
+    public String toContextString(Context context) {
+        return context + "/" + this.toTagString();        
+    }
+
 }
