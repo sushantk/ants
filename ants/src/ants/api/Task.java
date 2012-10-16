@@ -19,30 +19,30 @@ public abstract class Task {
     }
 
     static public enum Type {
-        CPU, SYNC_IO, ASYNC_IO
+        SYNC, ASYNC
     }
 
     /**
      * Used by the task manager to monitor task activity and run the next set of
      * tasks of returned by the callbacks
      */
-    public interface Monitor {
+    public interface IMonitor {
         /**
          * Notify the monitor when the task has finished fetching the data
          */
-        void onDone(Task task, Collection<Task> next);
+        void onDone(final Task task, Collection<Task> next);
     }
 
     /**
      * Callback to send the task completion notification to one or more
      * listeners.
      */
-    public interface Callback {
+    public interface ICallback {
         /**
          * The listener can return one more tasks as a result to execute after
          * the callback
          */
-        Collection<Task> onDone(Task task);
+        Collection<Task> onDone(final Task task);
     }
 
     private Type type;
@@ -50,8 +50,8 @@ public abstract class Task {
     private Result result = Result.FAILED;
     private Data data;
 
-    private LinkedList<Callback> callbacks = new LinkedList<Callback>();
-    private Monitor monitor;
+    private LinkedList<ICallback> callbacks = new LinkedList<ICallback>();
+    private IMonitor monitor;
 
     public Task(Type type) {
         this.type = type;
@@ -73,7 +73,7 @@ public abstract class Task {
         return this.data;
     }
 
-    public void addCallback(Callback callback) {
+    public void addCallback(ICallback callback) {
         this.callbacks.add(callback);
     }
 
@@ -89,7 +89,7 @@ public abstract class Task {
         this.complete();
     }
 
-    public void setMonitor(Monitor monitor) {
+    public void setMonitor(IMonitor monitor) {
         this.monitor = monitor;
     }
 
@@ -101,19 +101,20 @@ public abstract class Task {
         }
 
         this.status = Status.RUNNING;
+        // TODO: handle exception?
         Collection<Task> next = this.runImpl();
 
         // If it is a sync task, not done and no further tasks are returned,
         // it must have failed
-        if((Type.ASYNC_IO != this.type) && (Status.DONE != this.status) && (next.isEmpty())) {
-            this.setData(null, Result.FAILED);    
+        if((Type.ASYNC != this.type) && (Status.DONE != this.status) && (next.isEmpty())) {
+            this.setData(null, Result.FAILED);
         }
 
         return next;
     }
 
     public String toString() {
-        return "<" + super.toString() + ", " + this.type + ">";
+        return super.toString() + "<" + this.type + ">";
     }
 
     /**
@@ -122,7 +123,8 @@ public abstract class Task {
      */
     private void complete() {
         LinkedList<Task> nextTasks = new LinkedList<Task>();
-        for (Task.Callback callback : this.callbacks) {
+        for (Task.ICallback callback : this.callbacks) {
+            // TODO: handle exception?
             Collection<Task> cbNextTasks = callback.onDone(this);
             nextTasks.addAll(cbNextTasks);
         }

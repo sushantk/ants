@@ -8,8 +8,8 @@ public class RequestContext extends Context {
     
     IObjectFactory factory;
 
-    public RequestContext(LinkedHashMap<String, Type> params) {
-        super(null, params);
+    public RequestContext(String id, LinkedHashMap<String, Type> params) {
+        super(id, params, null);
     }
 
     public IObjectFactory getFactory() {
@@ -23,5 +23,9 @@ public class RequestContext extends Context {
     public boolean isLogging() {
         // TODO: use filters
         return true;
+    }
+    
+    public String toString() {
+        return "request<" + this.getId() + ">";
     }
 }

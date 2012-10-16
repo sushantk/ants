@@ -1,6 +1,6 @@
 package ants.exception;
 
-public class ParseException extends Exception {
+public class ParseException extends RuntimeException {
 
     public ParseException(String s) {
         super(s);

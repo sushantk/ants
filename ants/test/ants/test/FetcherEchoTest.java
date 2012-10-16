@@ -23,8 +23,8 @@ public class FetcherEchoTest {
         
         ExecuteContext context = new TestExecuteContext();
         Task task = fetcher.fetch(context);
-        task.setMonitor(new TestTaskExecutor());
-        task.run();
+        TestTaskExecutor taskExecutor = new TestTaskExecutor();
+        taskExecutor.run(task);
         
         assertEquals("Task is done", Task.Status.DONE, task.getStatus());
         assertEquals("Result is success", Task.Result.SUCCEDED, task.getResult());
@@ -40,8 +40,8 @@ public class FetcherEchoTest {
         
         ExecuteContext context = new TestExecuteContext();
         Task task = fetcher.fetch(context);
-        task.setMonitor(new TestTaskExecutor());
-        task.run();
+        TestTaskExecutor taskExecutor = new TestTaskExecutor();
+        taskExecutor.run(task);
         
         assertEquals("Task is done", Task.Status.DONE, task.getStatus());
         assertEquals("Result is failed", Task.Result.FAILED, task.getResult());

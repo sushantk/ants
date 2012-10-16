@@ -4,16 +4,23 @@ import java.util.Collection;
 
 import ants.api.Task;
 
-public class TestTaskExecutor implements Task.Monitor {
+public class TestTaskExecutor implements Task.IMonitor {
 
-    private Collection<Task> next;
+    public void run(final Task task) {
+        task.setMonitor(this);
+        Collection<Task> next = task.run();
+        this.runNext(next);
+    }
 
     @Override
-    public void onDone(Task task, Collection<Task> next) {
-        this.next = next;
+    public void onDone(final Task task, Collection<Task> next) {
+        this.runNext(next);
     }
 
-    public Collection<Task> getNext() {
-        return next;
+    private void runNext(Collection<Task> next) {
+        for (Task task : next) {
+            this.run(task);
+        }
     }
+
 }

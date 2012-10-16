@@ -7,17 +7,23 @@ import ants.api.IParams.Type;
 public class ExecuteContext extends Context {
 
     private ModuleContext moduleContext;
-    
-    public ExecuteContext(ModuleContext moduleContext, LinkedHashMap<String, Type> params) {
-        super(moduleContext, params);
 
-        this.moduleContext = moduleContext;
+    public ExecuteContext(String id, LinkedHashMap<String, Type> params,
+            ModuleContext parent) {
+        super(id, params, parent);
+
+        this.moduleContext = parent;
     }
 
-    public ExecuteContext(ExecuteContext executeContext, LinkedHashMap<String, Type> params) {
-        super(executeContext, params);
+    public ExecuteContext(String id, LinkedHashMap<String, Type> params,
+            ExecuteContext parent) {
+        super(id, params, parent);
 
-        this.moduleContext = executeContext.getModuleContext();
+        this.moduleContext = parent.getModuleContext();
+    }
+
+    public RequestContext getRequestContext() {
+        return this.moduleContext.getRequestContext();
     }
 
     public ModuleContext getModuleContext() {
@@ -28,8 +34,8 @@ public class ExecuteContext extends Context {
     public boolean isLogging() {
         return this.moduleContext.isLogging();
     }
-    
+
     public String toString() {
-        return this.moduleContext.toString();
+        return this.getParent().toString() + "/context<" + this.getId() + ">";
     }
 }

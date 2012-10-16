@@ -32,19 +32,15 @@ public class FetcherEcho extends Configurable
         this.value = IString.class.cast(value);
     }
 
-    /**
-     * In general fetchers will be sync_io or async_io. This is
-     * shown as an example.
-     */
     @Override
     public Task fetch(final ExecuteContext context) {
-        return new Task(Task.Type.SYNC_IO) {
+        return new Task(Task.Type.SYNC) {
             protected Collection<Task> runImpl() {
                 try {
                     String str = FetcherEcho.this.value.getValue(context);
                     this.setData(new Data(str, Const.mime.plain), Task.Result.SUCCEDED);
                 } catch (EvaluateException e) {
-                    logger.error(FetcherEcho.this.toContextString(context) + ": Failed to fetch data", e);
+                    logger.error(FetcherEcho.this.toContextString(context) + ": Failed to evaluate echo string", e);
                 }
                 return Collections.emptyList();
             }

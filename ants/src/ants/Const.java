@@ -6,10 +6,12 @@ public final class Const {
         public static final String ModuleClass = "ants.ModuleDefault";
         public static final String StringClass = "ants.StringDefault";
         public static final String ParamsClass = "ants.ParamsDefault";
+        public static final String FetcherClass = "ants.FetcherWebservice";
     }
 
     public static class tag {
         public static final String module = "module";
+        public static final String fetcher = "fetcher";
     }
 
     public static class attribute {

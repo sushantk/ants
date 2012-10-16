@@ -6,7 +6,7 @@ import ants.api.RequestContext;
 
 public class TestExecuteContext extends ExecuteContext {
     public TestExecuteContext() {
-        super(new ModuleContext("test-instance", "test-module", 
-                null, new RequestContext(null), null), null);
+        super("test-object", null, new ModuleContext("test-module", 
+                null, new RequestContext("test-request", null), null));
     }
 }

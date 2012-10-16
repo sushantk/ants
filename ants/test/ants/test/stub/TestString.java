@@ -6,7 +6,7 @@ import ants.api.IString;
 import ants.exception.EvaluateException;
 
 public class TestString extends Configurable
-                           implements IString {
+                        implements IString {
 
     private String value;
     private boolean returnSuccess;

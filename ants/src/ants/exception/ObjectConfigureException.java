@@ -1,6 +1,6 @@
 package ants.exception;
 
-public class ObjectConfigureException extends Exception {
+public class ObjectConfigureException extends RuntimeException {
 
     public ObjectConfigureException(String s) {
         super(s);

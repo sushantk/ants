@@ -13,38 +13,28 @@ import ants.api.Task;
 /**
  * Provides foundation for task execution
  */
-public class TaskExecutor implements Task.Monitor {
+public class TaskExecutor implements Task.IMonitor {
 
     private static final Logger logger = LoggerFactory
             .getLogger(TaskExecutor.class);
 
-    private static ThreadPoolExecutor cpuTaskExecutor;
-    private static ThreadPoolExecutor syncIOTaskExecutor;
+    private static ThreadPoolExecutor syncTaskExecutor;
 
     /*
      * One time configuration to tune thread pools as per the need and system
      * capacity
      */
     public static void configure(int cpuTaskPoolSize, int syncIOTaskPoolSize) {
-        // cpu tasks have a fixed size pre-started thread pool with an unbounded
-        // queue. it is recommended that the pool size be a little more than the
-        // number of available cores in the system
-        ThreadPoolExecutor cpuTaskExecutor = new ThreadPoolExecutor(
-                cpuTaskPoolSize, cpuTaskPoolSize, 0, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<Runnable>(cpuTaskPoolSize));
-        cpuTaskExecutor.allowCoreThreadTimeOut(false);
-        cpuTaskExecutor.prestartAllCoreThreads();
-        TaskExecutor.cpuTaskExecutor = cpuTaskExecutor;
 
-        // sync io tasks have a fixed size thread pool with an unbounded queue.
+        // sync tasks have a fixed size thread pool with an unbounded queue.
         // threads start and grow up to the pool size as per the need and also
         // stay alive after the use.
-        ThreadPoolExecutor syncIOTaskExecutor = new ThreadPoolExecutor(
+        ThreadPoolExecutor syncTaskExecutor = new ThreadPoolExecutor(
                 syncIOTaskPoolSize, syncIOTaskPoolSize, 0,
                 TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(
                         syncIOTaskPoolSize));
-        syncIOTaskExecutor.allowCoreThreadTimeOut(false);
-        TaskExecutor.syncIOTaskExecutor = syncIOTaskExecutor;
+        syncTaskExecutor.allowCoreThreadTimeOut(false);
+        TaskExecutor.syncTaskExecutor = syncTaskExecutor;
     }
 
     boolean logging;
@@ -60,8 +50,8 @@ public class TaskExecutor implements Task.Monitor {
 
         final TaskExecutor self = this;
         switch (task.getType()) {
-        case CPU: {
-            TaskExecutor.cpuTaskExecutor.submit(new Runnable() {
+        case SYNC: {
+            TaskExecutor.syncTaskExecutor.submit(new Runnable() {
                 @Override
                 public void run() {
                     self.run(task);
@@ -69,16 +59,7 @@ public class TaskExecutor implements Task.Monitor {
             });
         }
             break;
-        case SYNC_IO: {
-            TaskExecutor.syncIOTaskExecutor.submit(new Runnable() {
-                @Override
-                public void run() {
-                    self.run(task);
-                }
-            });
-        }
-            break;
-        case ASYNC_IO: {
+        case ASYNC: {
             // async tasks don't need a managed thread pool, they should have
             // their own pool as required
             self.run(task);
@@ -91,7 +72,7 @@ public class TaskExecutor implements Task.Monitor {
      * @see ants.api.Task.Monitor#onReady(ants.api.Task, Collection<Task> next)
      */
     @Override
-    public void onDone(Task task, Collection<Task> next) {
+    public void onDone(final Task task, Collection<Task> next) {
         logger.trace("Task done: {}, next: ", task, next);
         this.runNext(next);
     }

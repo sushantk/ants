@@ -5,13 +5,19 @@ import java.util.LinkedHashMap;
 import ants.api.IParams.Type;
 
 public abstract class Context {
-
-    private Context parent;    
+ 
+    private String id;
     private LinkedHashMap<String, Type> params;
+    private Context parent;
 
-    public Context(Context parent, LinkedHashMap<String, Type> params) {
-        this.parent = parent;
+    public Context(String id, LinkedHashMap<String, Type> params, Context parent) {
+        this.id = id;
         this.params = params;
+        this.parent = parent;
+    }
+
+    public String getId() {
+        return this.id;
     }
 
     public Context getParent() {
