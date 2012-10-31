@@ -38,7 +38,11 @@ public abstract class Configurable {
     }
     
     public String toContextString(Context context) {
-        return context + "/" + this.toTagString();        
+        return context + "/" + this.toTagString();
+    }
+
+    public String toContextString(Context context, String s) {
+        return context + "/" + this.toTagString() + "/" + s;
     }
 
 }

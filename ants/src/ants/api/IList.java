@@ -6,6 +6,6 @@ import ants.exception.EvaluateException;
 
 public interface IList {
 
-    LinkedHashMap<String, Configurable> getItems(ExecuteContext context)
+    LinkedHashMap<String, Configurable> getItems(ContextModule context)
             throws EvaluateException;
 }

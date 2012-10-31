@@ -2,7 +2,7 @@ package ants.exception;
 
 public class InvalidStateException extends RuntimeException {
     
-    public InvalidStateException(String s) {
-        super(s);
+    public InvalidStateException(String key, String message) {
+        super(key + ": " + message);
     }
 }

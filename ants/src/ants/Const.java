@@ -25,6 +25,11 @@ public final class Const {
         public static final String plain = "text/plain";
     }
 
+    public static class charSet {
+        public static final String utf8 = "utf-8";
+        public static final String ascii = "us-ascii";
+    }
+
     public static final String comma = ",";
 
     public static final String set = "set";

@@ -4,30 +4,30 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import ants.Const;
-import ants.FetcherEcho;
+import ants.ModuleEcho;
 import ants.api.Data;
-import ants.api.ExecuteContext;
+import ants.api.ContextModule;
 import ants.api.Task;
-import ants.test.stub.TestExecuteContext;
+import ants.test.stub.TestModuleContext;
 import ants.test.stub.TestString;
 import ants.test.stub.TestTaskExecutor;
 
-public class FetcherEchoTest {
+public class ModuleEchoTest {
     
     @Test
     public void testSuccess() {
         String testStr = "Hello World";
 
-        FetcherEcho fetcher = new FetcherEcho("fetcher", "");
-        fetcher.setString(new TestString(testStr, true));
+        ModuleEcho fetcher = new ModuleEcho("fetcher", "");
+        fetcher.setString(new TestString(testStr));
         
-        ExecuteContext context = new TestExecuteContext();
-        Task task = fetcher.fetch(context);
+        ContextModule context = new TestModuleContext();
+        Task task = fetcher.execute(context, null);
         TestTaskExecutor taskExecutor = new TestTaskExecutor();
-        taskExecutor.run(task);
+        taskExecutor.submit(task);
         
         assertEquals("Task is done", Task.Status.DONE, task.getStatus());
-        assertEquals("Result is success", Task.Result.SUCCEDED, task.getResult());
+        assertEquals("Result is success", Task.Result.COMPLETED, task.getResult());
         Data data = task.getData();
         assertEquals("Data mime type is plain", Const.mime.plain, data.getMimeType());
         assertEquals("Data is as given", testStr, data.getObject());
@@ -35,13 +35,13 @@ public class FetcherEchoTest {
 
     @Test
     public void testFail() {
-        FetcherEcho fetcher = new FetcherEcho("fetcher", "");
-        fetcher.setString(new TestString(null, false));
+        ModuleEcho fetcher = new ModuleEcho("fetcher", "");
+        fetcher.setString(new TestString());
         
-        ExecuteContext context = new TestExecuteContext();
-        Task task = fetcher.fetch(context);
+        ContextModule context = new TestModuleContext();
+        Task task = fetcher.execute(context, null);
         TestTaskExecutor taskExecutor = new TestTaskExecutor();
-        taskExecutor.run(task);
+        taskExecutor.submit(task);
         
         assertEquals("Task is done", Task.Status.DONE, task.getStatus());
         assertEquals("Result is failed", Task.Result.FAILED, task.getResult());

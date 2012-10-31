@@ -3,8 +3,8 @@ package ants;
 import ants.annotation.ConfigurableClass;
 import ants.annotation.ConfigurableMethod;
 import ants.api.Configurable;
-import ants.api.ExecuteContext;
 import ants.api.IString;
+import ants.api.ContextModule;
 
 @ConfigurableClass(expectsValue=true)
 public class StringLiteral extends Configurable
@@ -22,7 +22,7 @@ public class StringLiteral extends Configurable
     }
 
     @Override
-    public String getValue(ExecuteContext context) {
+    public String getValue(ContextModule context) {
         return this.value;
     }
     

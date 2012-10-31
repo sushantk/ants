@@ -3,6 +3,9 @@ package ants.api;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ants.exception.InvalidStateException;
 
 /**
@@ -11,26 +14,34 @@ import ants.exception.InvalidStateException;
 public abstract class Task {
 
     static public enum Status {
-        NOT_RUN, RUNNING, DONE
+        NOT_RUN, READY, RUNNING, DONE
     }
 
     static public enum Result {
-        FAILED, SUCCEDED, TIMEDOUT
+        FAILED, COMPLETED, TIMEDOUT
     }
 
     static public enum Type {
         SYNC, ASYNC
     }
 
+    private static final Logger logger = LoggerFactory.getLogger(Task.class);
+
     /**
      * Used by the task manager to monitor task activity and run the next set of
      * tasks of returned by the callbacks
      */
-    public interface IMonitor {
+    public interface IExecutor {
+        
+        /**
+         * Notify the executor when an async task is ready to run
+         */
+        void onAsyncReady(final Task task);
+        
         /**
          * Notify the monitor when the task has finished fetching the data
          */
-        void onDone(final Task task, Collection<Task> next);
+        void onDone(final Task task, Collection<ICallback> calbacks);
     }
 
     /**
@@ -46,15 +57,21 @@ public abstract class Task {
     }
 
     private Type type;
+    private String key;
     private Status status = Status.NOT_RUN;
     private Result result = Result.FAILED;
     private Data data;
 
     private LinkedList<ICallback> callbacks = new LinkedList<ICallback>();
-    private IMonitor monitor;
+    private IExecutor executor;
 
-    public Task(Type type) {
+    public Task(Type type, String key) {
         this.type = type;
+        this.key = key;
+
+        if(Type.SYNC == type) {
+            this.status = Status.READY;
+        }
     }
 
     public Type getType() {
@@ -72,32 +89,52 @@ public abstract class Task {
     public Data getData() {
         return this.data;
     }
-
+    
     public void addCallback(ICallback callback) {
         this.callbacks.add(callback);
     }
 
-    public void setData(Data data, Result result) throws InvalidStateException {
-        if (Status.RUNNING != this.status) {
-            throw new InvalidStateException("Task is not run yet: " + this);
+    synchronized public void ready() throws InvalidStateException {
+        if (Status.NOT_RUN != this.status) {
+            throw new InvalidStateException(this.toString(), "Task is not in NOT_RUN state");
         }
-
-        this.data = data;
-        this.result = result;
-        this.status = Status.DONE;
-
-        this.complete();
+        
+        this.status = Status.READY;
+        if(null != this.executor) {
+            this.executor.onAsyncReady(this);
+        }
     }
 
-    public void setMonitor(IMonitor monitor) {
-        this.monitor = monitor;
+    public void completed(Data data) throws InvalidStateException {
+        if (Status.RUNNING != this.status) {
+            throw new InvalidStateException(this.toString(), "Task is not run yet");
+        }
+
+        this.done(data, Result.COMPLETED);
+    }
+
+    public void failed(Data data, Throwable e) throws InvalidStateException {
+        if (Status.RUNNING != this.status) {
+            throw new InvalidStateException(this.toString(), "Task is not run yet");
+        }
+
+        logger.error("Failed to run task: " + this, e);
+        this.done(data, Result.FAILED);
+    }
+
+    synchronized public void setExecutor(IExecutor executor) {
+        this.executor = executor;
+        
+        if((Type.ASYNC == this.type) && (Status.READY == this.status)) {
+            this.executor.onAsyncReady(this);
+        }
     }
 
     protected abstract Collection<Task> runImpl();
 
     public final Collection<Task> run() {
-        if (Status.NOT_RUN != this.status) {
-            throw new InvalidStateException("Task is already run: " + this);
+        if (Status.READY != this.status) {
+            throw new InvalidStateException(this.toString(), "Task is not ready to run");
         }
 
         this.status = Status.RUNNING;
@@ -107,28 +144,22 @@ public abstract class Task {
         // If it is a sync task, not done and no further tasks are returned,
         // it must have failed
         if((Type.ASYNC != this.type) && (Status.DONE != this.status) && (next.isEmpty())) {
-            this.setData(null, Result.FAILED);
+            this.completed(null);
         }
 
         return next;
     }
 
     public String toString() {
-        return super.toString() + "<" + this.type + ">";
+        return this.key + "/task<" + this.getClass().getName() + ", " + this.type + ">";
+    }
+    
+    private void done(Data data, Result result) {
+        this.status = Status.DONE;
+
+        this.data = data;
+        this.result = result;
+        this.executor.onDone(this, this.callbacks);
     }
 
-    /**
-     * Notify callbacks, collect tasks and finally notify the monitor with the
-     * tasks collected from the callbacks
-     */
-    private void complete() {
-        LinkedList<Task> nextTasks = new LinkedList<Task>();
-        for (Task.ICallback callback : this.callbacks) {
-            // TODO: handle exception?
-            Collection<Task> cbNextTasks = callback.onDone(this);
-            nextTasks.addAll(cbNextTasks);
-        }
-
-        this.monitor.onDone(this, nextTasks);
-    }
 }

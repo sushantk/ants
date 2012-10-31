@@ -2,6 +2,6 @@ package ants.api;
 
 public interface IModule {
 
-    Task execute(ModuleContext context);
+    Task execute(ContextModule context, Data input);
 
 }

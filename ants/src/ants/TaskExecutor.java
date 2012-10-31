@@ -1,6 +1,7 @@
 package ants;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -13,12 +14,14 @@ import ants.api.Task;
 /**
  * Provides foundation for task execution
  */
-public class TaskExecutor implements Task.IMonitor {
+public class TaskExecutor implements Task.IExecutor {
 
     private static final Logger logger = LoggerFactory
             .getLogger(TaskExecutor.class);
 
     private static ThreadPoolExecutor syncTaskExecutor;
+    
+    private int taskCount = 0;
 
     /*
      * One time configuration to tune thread pools as per the need and system
@@ -37,46 +40,54 @@ public class TaskExecutor implements Task.IMonitor {
         TaskExecutor.syncTaskExecutor = syncTaskExecutor;
     }
 
-    boolean logging;
-
-    public TaskExecutor(boolean logging) {
-        this.logging = logging;
+    public TaskExecutor() {
     }
 
-    public void queue(final Task task) {
-        logger.debug("Queue task: {}: ", task);
+    public void submit(Task task) {
+        this.submit(task, true);
+    }
+    
+    private void submit(Task task, boolean queue) {
+        logger.debug("Received task #{}: {}: ", task, ++taskCount);
 
-        task.setMonitor(this);
+        task.setExecutor(this);
 
-        final TaskExecutor self = this;
-        switch (task.getType()) {
-        case SYNC: {
-            TaskExecutor.syncTaskExecutor.submit(new Runnable() {
-                @Override
-                public void run() {
-                    self.run(task);
-                }
-            });
+        // async tasks need to tell us when they are ready to run
+        if (Task.Type.SYNC == task.getType()) {
+            // resulting tasks can run right away
+            if(queue) {
+                this.queue(task);
+            } else {
+                this.run(task);
+            }
         }
-            break;
-        case ASYNC: {
-            // async tasks don't need a managed thread pool, they should have
-            // their own pool as required
-            self.run(task);
-        }
-            break;
-        }
+    }
+
+    /**
+     * @see ants.api.Task.Monitor#onAsyncReady(ants.api.Task)
+     */
+    @Override
+    public void onAsyncReady(Task task) {
+        this.queue(task);
     }
 
     /**
      * @see ants.api.Task.Monitor#onReady(ants.api.Task, Collection<Task> next)
      */
     @Override
-    public void onDone(final Task task, Collection<Task> next) {
-        logger.trace("Task done: {}, next: ", task, next);
-        this.runNext(next);
-    }
+    public void onDone(final Task task, Collection<Task.ICallback> callbacks) {
+        logger.trace("Task done: {}", task);
 
+        LinkedList<Task> nextTasks = new LinkedList<Task>();
+        for (Task.ICallback callback : callbacks) {
+            // TODO: handle exception?
+            Collection<Task> cbNextTasks = callback.onDone(task);
+            nextTasks.addAll(cbNextTasks);
+        }
+
+        this.submitNext(nextTasks);
+    }
+    
     /**
      * run a task and the set of tasks collected as a result
      */
@@ -85,20 +96,31 @@ public class TaskExecutor implements Task.IMonitor {
 
         try {
             Collection<Task> next = task.run();
-            this.runNext(next);
+            this.submitNext(next);
         } catch(Exception e) {
             // Catching all exceptions for error reporting
             logger.error("Failed to run task: " + task, e);
         }
     }
-
+    
     /**
-     * Run a set of tasks returned as a result of previous activities
+     * Submits a set of tasks returned as a result of previous activities
      */
-    private void runNext(Collection<Task> next) {
+    private void submitNext(Collection<Task> next) {
+        // Reuse the current thread to continue further execution
+        // if there is only one task
+        boolean queue = next.size() > 1;
         for (Task task : next) {
-            this.queue(task);
+            this.submit(task, queue);
         }
     }
-
+    
+    private void queue(final Task task) {
+        TaskExecutor.syncTaskExecutor.submit(new Runnable() {
+            @Override
+            public void run() {
+                TaskExecutor.this.run(task);
+            }
+        });
+    }
 }

@@ -5,29 +5,29 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import ants.api.Data;
-import ants.api.FetcherTask;
+import ants.api.TaskModule;
 import ants.api.Task;
-import ants.test.stub.TestExecuteContext;
-import ants.test.stub.TestFetcher;
+import ants.test.stub.TestModuleContext;
+import ants.test.stub.TestModule;
 import ants.test.stub.TestObjectFactory;
 import ants.test.stub.TestTaskExecutor;
 
-public class FetcherTaskTest {
+public class ModuleTaskTest {
     
     @Test
     public void testRun() {
-        Data testData = new Data(null, "");
-        TestFetcher fetcher = new TestFetcher(testData, true);
+        Data testData = new Data(null, "", "");
+        TestModule fetcher = new TestModule(testData);
 
-        TestExecuteContext context = new TestExecuteContext();
+        TestModuleContext context = new TestModuleContext();
         context.getRequestContext().setFactory(new TestObjectFactory(fetcher));
-        FetcherTask task = new FetcherTask(context);
+        TaskModule task = new TaskModule(context, null);
 
         TestTaskExecutor taskExecutor = new TestTaskExecutor();
-        taskExecutor.run(task);
+        taskExecutor.submit(task);
         
         assertEquals("Task is done", Task.Status.DONE, task.getStatus());
-        assertEquals("Result is success", Task.Result.SUCCEDED, task.getResult());
+        assertEquals("Result is success", Task.Result.COMPLETED, task.getResult());
         assertEquals("Data is as given", testData, task.getData());
     }
 

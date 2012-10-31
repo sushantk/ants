@@ -164,7 +164,7 @@ public class ObjectFactory implements IObjectFactory {
 
         Class<?> klass = object.getClass();
         ConfigurableClass kannotation = klass.getAnnotation(ConfigurableClass.class);
-        boolean expectsValue = (null == kannotation ? false : kannotation.expectsValue());
+        boolean classExpectsValue = (null == kannotation ? false : kannotation.expectsValue());
         Iterator<Entry<String, JsonNode>> it = node.getFields();
         while (it.hasNext()) {
             Entry<String, JsonNode> entry = it.next();
@@ -181,7 +181,7 @@ public class ObjectFactory implements IObjectFactory {
                     + childTagName.substring(0, 1).toUpperCase()
                     + childTagName.substring(1);
             Method method;
-            if(expectsValue) {
+            if(classExpectsValue) {
                 method = klass.getMethod(setMethodName, String.class);
                 method.invoke(object, childNode.asText());
             } else {
@@ -197,10 +197,10 @@ public class ObjectFactory implements IObjectFactory {
                     defaultListItemClass = mannotation.defaultListItemClass();
                     listItemTag = mannotation.listItemTag();
                 }
-    
+
                 Configurable childObject = ObjectFactory.configure(childNode,
-                            defaultClass, childTagName, "",
-                            defaultListItemClass, listItemTag, tagStack);
+                        defaultClass, childTagName, "",
+                        defaultListItemClass, listItemTag, tagStack);
                 method.invoke(object, childObject);
             }
 

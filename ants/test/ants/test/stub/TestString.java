@@ -1,8 +1,8 @@
 package ants.test.stub;
 
 import ants.api.Configurable;
-import ants.api.ExecuteContext;
 import ants.api.IString;
+import ants.api.ContextModule;
 import ants.exception.EvaluateException;
 
 public class TestString extends Configurable
@@ -11,20 +11,26 @@ public class TestString extends Configurable
     private String value;
     private boolean returnSuccess;
 
-    public TestString(String value, boolean returnSuccess) {
+    public TestString() {
+        super("string", "");
+        
+        this.returnSuccess = false;
+    }
+
+    public TestString(String value) {
         super("string", "");
         
         this.value = value;
-        this.returnSuccess = returnSuccess;
+        this.returnSuccess = true;
     }
-    
+
     @Override
-    public String getValue(ExecuteContext context) throws EvaluateException {
+    public String getValue(ContextModule context) throws EvaluateException {
         if(this.returnSuccess) {
             return this.value;
         }
         
-        throw new EvaluateException(this.value, context, this);
+        throw new EvaluateException(this.toContextString(context, this.value), "Returning failure");
     }
     
     public String toString() {

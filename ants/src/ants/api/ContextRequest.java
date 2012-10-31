@@ -4,11 +4,11 @@ import java.util.LinkedHashMap;
 
 import ants.api.IParams.Type;
 
-public class RequestContext extends Context {
+public class ContextRequest extends Context {
     
     IObjectFactory factory;
 
-    public RequestContext(String id, LinkedHashMap<String, Type> params) {
+    public ContextRequest(String id, LinkedHashMap<String, Type> params) {
         super(id, params, null);
     }
 

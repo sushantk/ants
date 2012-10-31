@@ -12,11 +12,11 @@ import org.junit.Test;
 import ants.ObjectFactory;
 import ants.ParamsDefault;
 import ants.api.IParams.Type;
-import ants.api.ExecuteContext;
+import ants.api.ContextModule;
 import ants.exception.ObjectConfigureException;
 import ants.exception.EvaluateException;
 import ants.exception.ParseException;
-import ants.test.stub.TestExecuteContext;
+import ants.test.stub.TestModuleContext;
 
 public class ParamsDefaultTest {
 
@@ -26,7 +26,7 @@ public class ParamsDefaultTest {
         InputStream is = this.getClass().getResourceAsStream(jsonFile);
         JsonNode tree = ObjectFactory.parse(jsonFile, is);
         
-        ExecuteContext context = new TestExecuteContext();
+        ContextModule context = new TestModuleContext();
         ParamsDefault params = (ParamsDefault)ObjectFactory.configure(tree, ParamsDefault.class.getName(), "", "", "", "");
         LinkedHashMap<String, Type> result = params.getPairs(context, true);
         assertEquals("Simple params size", 2, result.size());
@@ -40,7 +40,7 @@ public class ParamsDefaultTest {
         InputStream is = this.getClass().getResourceAsStream(jsonFile);
         JsonNode tree = ObjectFactory.parse(jsonFile, is);
         
-        ExecuteContext context = new TestExecuteContext();
+        ContextModule context = new TestModuleContext();
         ParamsDefault params = (ParamsDefault)ObjectFactory.configure(tree, ParamsDefault.class.getName(), "", "", "", "");
         LinkedHashMap<String, Type> result = params.getPairs(context, true);
         assertEquals("Simple params size", 3, result.size());
@@ -62,7 +62,7 @@ public class ParamsDefaultTest {
         InputStream is = this.getClass().getResourceAsStream(jsonFile);
         JsonNode tree = ObjectFactory.parse(jsonFile, is);
         
-        ExecuteContext context = new TestExecuteContext();
+        ContextModule context = new TestModuleContext();
         ParamsDefault params = (ParamsDefault)ObjectFactory.configure(tree, ParamsDefault.class.getName(), "", "", "", "");
         boolean failed = false;
         try {
@@ -80,7 +80,7 @@ public class ParamsDefaultTest {
         InputStream is = this.getClass().getResourceAsStream(jsonFile);
         JsonNode tree = ObjectFactory.parse(jsonFile, is);
         
-        ExecuteContext context = new TestExecuteContext();
+        ContextModule context = new TestModuleContext();
         ParamsDefault params = (ParamsDefault)ObjectFactory.configure(tree, ParamsDefault.class.getName(), "", "", "", "");
         LinkedHashMap<String, Type> result = params.getPairs(context, false);
         System.out.println(result);
@@ -99,10 +99,9 @@ public class ParamsDefaultTest {
     public void testMultiValue() throws ParseException, ObjectConfigureException, EvaluateException {
         String jsonFile = "data/ParamsDefault/multivalue.json";
         InputStream is = this.getClass().getResourceAsStream(jsonFile);
-        ObjectFactory factory = new ObjectFactory();
         JsonNode tree = ObjectFactory.parse(jsonFile, is);
         
-        ExecuteContext context = new TestExecuteContext();
+        ContextModule context = new TestModuleContext();
         ParamsDefault params = (ParamsDefault)ObjectFactory.configure(tree, ParamsDefault.class.getName(), "", "", "", "");
         LinkedHashMap<String, Type> result = params.getPairs(context, false);
 
@@ -120,7 +119,7 @@ public class ParamsDefaultTest {
         InputStream is = this.getClass().getResourceAsStream(jsonFile);
         JsonNode tree = ObjectFactory.parse(jsonFile, is);
         
-        ExecuteContext context = new TestExecuteContext();
+        ContextModule context = new TestModuleContext();
         ParamsDefault params = (ParamsDefault)ObjectFactory.configure(tree, ParamsDefault.class.getName(), "", "", "", "");
         LinkedHashMap<String, Type> result = params.getPairs(context, false);
 

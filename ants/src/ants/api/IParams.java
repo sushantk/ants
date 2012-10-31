@@ -1,8 +1,6 @@
 package ants.api;
 
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 import ants.exception.EvaluateException;
 
@@ -77,6 +75,6 @@ public interface IParams {
         }
     }
 
-    LinkedHashMap<String, Type> getPairs(ExecuteContext context,
+    LinkedHashMap<String, Type> getPairs(ContextModule context,
             boolean simple) throws EvaluateException;
 }

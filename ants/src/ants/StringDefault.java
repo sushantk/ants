@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 import ants.annotation.ConfigurableClass;
 import ants.annotation.ConfigurableMethod;
 import ants.api.Configurable;
-import ants.api.ExecuteContext;
 import ants.api.IString;
+import ants.api.ContextModule;
 
 @ConfigurableClass(expectsValue=true)
 public class StringDefault extends Configurable
@@ -26,7 +26,7 @@ public class StringDefault extends Configurable
     }
 
     @Override
-    public String getValue(ExecuteContext context) {
+    public String getValue(ContextModule context) {
         String evaledText = this.value;
         if(context.isLogging()) logger.debug("{} - Evaluated {}=>{}", new Object[]{context, this.value, evaledText});
         return evaledText;
