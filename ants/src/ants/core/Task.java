@@ -1,4 +1,4 @@
-package ants.api;
+package ants.core;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -26,23 +26,6 @@ public abstract class Task {
     }
 
     private static final Logger logger = LoggerFactory.getLogger(Task.class);
-
-    /**
-     * Used by the task manager to monitor task activity and run the next set of
-     * tasks of returned by the callbacks
-     */
-    public interface IExecutor {
-        
-        /**
-         * Notify the executor when an async task is ready to run
-         */
-        void onAsyncReady(final Task task);
-        
-        /**
-         * Notify the monitor when the task has finished fetching the data
-         */
-        void onDone(final Task task, Collection<ICallback> calbacks);
-    }
 
     /**
      * Callback to send the task completion notification to one or more
@@ -76,6 +59,10 @@ public abstract class Task {
 
     public Type getType() {
         return this.type;
+    }
+
+    public String getKey() {
+        return this.key;
     }
 
     public Status getStatus() {
@@ -161,5 +148,21 @@ public abstract class Task {
         this.result = result;
         this.executor.onDone(this, this.callbacks);
     }
-
+    
+    /**
+     * Used by the task manager to monitor task activity and run the next set of
+     * tasks of returned by the callbacks
+     */
+    public interface IExecutor {
+        
+        /**
+         * Notify the executor when an async task is ready to run
+         */
+        void onAsyncReady(final Task task);
+        
+        /**
+         * Notify the monitor when the task has finished fetching the data
+         */
+        void onDone(final Task task, Collection<ICallback> calbacks);
+    }
 }

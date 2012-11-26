@@ -1,7 +1,7 @@
 package ants.test.stub;
 
-import ants.api.ContextModule;
-import ants.api.ContextRequest;
+import ants.core.ContextModule;
+import ants.core.ContextRequest;
 
 public class TestModuleContext extends ContextModule {
     public TestModuleContext() {

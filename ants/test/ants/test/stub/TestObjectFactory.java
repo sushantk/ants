@@ -1,7 +1,7 @@
 package ants.test.stub;
 
-import ants.api.Configurable;
-import ants.api.IObjectFactory;
+import ants.core.Configurable;
+import ants.core.IObjectFactory;
 import ants.exception.ObjectConfigureException;
 import ants.exception.ParseException;
 

@@ -1,6 +1,10 @@
-package ants.api;
+package ants.ext;
 
-public abstract class Module extends Configurable {
+import ants.core.Configurable;
+import ants.core.Context;
+import ants.core.IModule;
+
+public abstract class Module extends Configurable implements IModule {
 
     public Module(String tagName, String id) {
         super(tagName, id);

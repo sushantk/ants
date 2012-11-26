@@ -1,10 +1,9 @@
-package ants;
+package ants.core;
 
 import java.io.InputStream;
 
 import org.codehaus.jackson.JsonNode;
 
-import ants.api.Configurable;
 import ants.exception.ObjectConfigureException;
 import ants.exception.ParseException;
 

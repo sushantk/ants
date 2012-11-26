@@ -1,9 +1,12 @@
-package ants.api;
+package ants.ext;
 
 import java.nio.channels.CompletionHandler;
 import java.util.Collection;
 import java.util.Collections;
 
+import ants.core.Data;
+import ants.core.Task;
+import ants.core.Task.Type;
 import ants.exception.ExecuteException;
 
 public class TaskNIO extends Task implements CompletionHandler<Integer, Object> {
@@ -29,10 +32,9 @@ public class TaskNIO extends Task implements CompletionHandler<Integer, Object> 
             super.failed(null, new ExecuteException(this.toString(), "Failed to execute", this.asyncException));
         } else if(null == this.asyncData) {
             super.failed(null, new ExecuteException(this.toString(), "Internal error, failed to set data"));
-        } else {
-            super.completed(this.asyncData);
         }
-
+        
+        super.completed(this.asyncData);
         return Collections.emptyList();
     }
 

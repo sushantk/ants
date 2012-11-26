@@ -1,4 +1,4 @@
-package ants;
+package ants.core;
 
 public final class Const {
 
@@ -23,6 +23,7 @@ public final class Const {
     
     public static class mime {
         public static final String plain = "text/plain";
+        public static final String object = "object";
     }
 
     public static class charSet {

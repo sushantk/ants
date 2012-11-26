@@ -1,0 +1,15 @@
+{
+    "fetcher": {
+        "@class": "ants.FetcherEcho",
+        "string": "Hello World"
+    }
+
+    "module": {
+        "fetcher": {
+            "id": "echo",
+            "params": {
+                "string": "Hello World"
+            }
+        }
+    }
+}

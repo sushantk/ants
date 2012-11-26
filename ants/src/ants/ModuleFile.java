@@ -7,19 +7,18 @@ import java.nio.file.Paths;
 import java.util.Collection;
 
 import ants.annotation.ConfigurableMethod;
-import ants.api.Configurable;
-import ants.api.Data;
-import ants.api.IModule;
-import ants.api.IString;
-import ants.api.ContextModule;
-import ants.api.Module;
-import ants.api.Task;
-import ants.api.TaskNIO;
-import ants.api.TaskFailed;
+import ants.core.Configurable;
+import ants.core.ContextModule;
+import ants.core.Data;
+import ants.core.IString;
+import ants.core.Task;
 import ants.exception.EvaluateException;
 import ants.exception.ExecuteException;
+import ants.ext.Module;
+import ants.ext.TaskFailed;
+import ants.ext.TaskNIO;
 
-public class ModuleFile extends Module implements IModule {
+public class ModuleFile extends Module {
 
     private IString path;
     private IString mime;
@@ -65,7 +64,6 @@ public class ModuleFile extends Module implements IModule {
             
             TaskNIO task = new TaskFile(data, this.toContextString(context, filePath));
             channel.read(dst, 0, null, task);
-
             return task;
         } catch (EvaluateException e) {
             return new TaskFailed(new ExecuteException(this.toContextString(context),
@@ -88,6 +86,8 @@ public class ModuleFile extends Module implements IModule {
 
         @Override
         protected Collection<Task> runImpl() {
+            ByteBuffer buffer = (ByteBuffer)this.runData.getData();
+            buffer.rewind();
             this.setAsyncData(runData);
             return super.runImpl();
         }

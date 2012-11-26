@@ -1,4 +1,4 @@
-package ants;
+package ants.core;
 
 public class Util {
 

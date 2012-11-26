@@ -1,4 +1,4 @@
-package ants;
+package ants.core;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -25,8 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import ants.annotation.ConfigurableClass;
 import ants.annotation.ConfigurableMethod;
-import ants.api.Configurable;
-import ants.api.IObjectFactory;
 import ants.exception.ObjectConfigureException;
 import ants.exception.ObjectCreateException;
 import ants.exception.ObjectIncompleteException;

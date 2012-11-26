@@ -1,7 +1,11 @@
-package ants.api;
+package ants.ext;
 
 import java.util.Collection;
 import java.util.Collections;
+
+import ants.core.Task;
+import ants.core.Task.ICallback;
+import ants.core.Task.Result;
 
 public class CallbackCopy implements Task.ICallback {
 

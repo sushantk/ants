@@ -3,7 +3,7 @@ package ants.test.stub;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import ants.api.Task;
+import ants.core.Task;
 
 public class TestTaskExecutor implements Task.IExecutor {
     

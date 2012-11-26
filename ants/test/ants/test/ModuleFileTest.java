@@ -8,14 +8,11 @@ import java.nio.charset.Charset;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import ants.Const;
 import ants.ModuleFile;
-import ants.api.Data;
-import ants.api.ContextModule;
-import ants.api.Task;
-import ants.test.stub.TestModuleContext;
+import ants.core.Const;
+import ants.core.Data;
+import ants.core.Task;
 import ants.test.stub.TestString;
-import ants.test.stub.TestTaskExecutor;
 
 public class ModuleFileTest {
     
@@ -28,12 +25,7 @@ public class ModuleFileTest {
         fetcher.setCharSet(new TestString(Const.charSet.ascii));
         fetcher.setPath(new TestString(path.getPath()));
         
-        ContextModule context = new TestModuleContext();
-        Task task = fetcher.execute(context, null);
-        
-        TestTaskExecutor taskExecutor = new TestTaskExecutor();
-        taskExecutor.submit(task);
-        taskExecutor.wait(task, 5000);
+        Task task = Util.executeModule(fetcher, 1000);
         
         assertEquals("Task is done", Task.Status.DONE, task.getStatus());
         assertEquals("Result is success", Task.Result.COMPLETED, task.getResult());
@@ -41,26 +33,22 @@ public class ModuleFileTest {
         assertEquals("Data mime type is plain", Const.mime.plain, data.getMimeType());
         assertEquals("Data charset is ascii", Const.charSet.ascii, data.getCharSet());
         
-        ByteBuffer buffer = (ByteBuffer)data.getObject();
-        buffer.rewind();
+        ByteBuffer buffer = (ByteBuffer)data.getData();
         String content = Charset.forName(data.getCharSet()).newDecoder().decode(buffer).toString();
         assertEquals("Data is as given", "dummy", content);
     }
 
     @Test
-    public void testFail() throws InterruptedException {
+    public void testFail() {
         ModuleFile fetcher = new ModuleFile("fetcher", "");
         fetcher.setMimeType(new TestString(Const.mime.plain));
         fetcher.setCharSet(new TestString(Const.charSet.ascii));
         fetcher.setPath(new TestString("data/non_existent"));
         
-        ContextModule context = new TestModuleContext();
-        Task task = fetcher.execute(context, null);
-
-        TestTaskExecutor taskExecutor = new TestTaskExecutor();
-        taskExecutor.submit(task);
+        Task task = Util.executeModule(fetcher);
 
         assertEquals("Task is done", Task.Status.DONE, task.getStatus());
         assertEquals("Result is failed", Task.Result.FAILED, task.getResult());
     }
+
 }

@@ -5,9 +5,9 @@ import org.slf4j.LoggerFactory;
 
 import ants.annotation.ConfigurableClass;
 import ants.annotation.ConfigurableMethod;
-import ants.api.Configurable;
-import ants.api.IString;
-import ants.api.ContextModule;
+import ants.core.Configurable;
+import ants.core.ContextModule;
+import ants.core.IString;
 
 @ConfigurableClass(expectsValue=true)
 public class StringDefault extends Configurable

@@ -3,13 +3,13 @@ package ants.test.stub;
 import java.util.Collection;
 import java.util.Collections;
 
-import ants.api.Configurable;
-import ants.api.Data;
-import ants.api.IModule;
-import ants.api.ContextModule;
-import ants.api.Module;
-import ants.api.Task;
+import ants.core.Configurable;
+import ants.core.ContextModule;
+import ants.core.Data;
+import ants.core.IModule;
+import ants.core.Task;
 import ants.exception.ExecuteException;
+import ants.ext.Module;
 
 public class TestModule extends Module implements IModule {
 

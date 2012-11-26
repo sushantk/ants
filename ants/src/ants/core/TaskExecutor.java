@@ -1,4 +1,4 @@
-package ants;
+package ants.core;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ants.api.Task;
 
 /**
  * Provides foundation for task execution
@@ -64,7 +63,7 @@ public class TaskExecutor implements Task.IExecutor {
     }
 
     /**
-     * @see ants.api.Task.Monitor#onAsyncReady(ants.api.Task)
+     * @see ants.core.Task.Monitor#onAsyncReady(ants.core.Task)
      */
     @Override
     public void onAsyncReady(Task task) {

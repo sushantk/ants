@@ -1,18 +1,19 @@
 package ants;
 
 import ants.annotation.ConfigurableMethod;
-import ants.api.Configurable;
-import ants.api.Data;
-import ants.api.TaskCompleted;
-import ants.api.IModule;
-import ants.api.IString;
-import ants.api.ContextModule;
-import ants.api.Task;
-import ants.api.TaskFailed;
+import ants.core.Configurable;
+import ants.core.Const;
+import ants.core.ContextModule;
+import ants.core.Data;
+import ants.core.IString;
+import ants.core.Task;
 import ants.exception.EvaluateException;
 import ants.exception.ExecuteException;
+import ants.ext.Module;
+import ants.ext.TaskCompleted;
+import ants.ext.TaskFailed;
 
-public class ModuleEcho extends Configurable implements IModule {
+public class ModuleEcho extends Module {
 
     private IString value;
 

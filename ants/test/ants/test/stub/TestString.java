@@ -1,8 +1,8 @@
 package ants.test.stub;
 
-import ants.api.Configurable;
-import ants.api.IString;
-import ants.api.ContextModule;
+import ants.core.Configurable;
+import ants.core.ContextModule;
+import ants.core.IString;
 import ants.exception.EvaluateException;
 
 public class TestString extends Configurable

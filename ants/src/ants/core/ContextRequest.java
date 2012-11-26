@@ -1,8 +1,8 @@
-package ants.api;
+package ants.core;
 
 import java.util.LinkedHashMap;
 
-import ants.api.IParams.Type;
+import ants.core.IParams.Type;
 
 public class ContextRequest extends Context {
     

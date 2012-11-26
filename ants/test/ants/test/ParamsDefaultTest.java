@@ -9,10 +9,10 @@ import java.util.LinkedHashMap;
 import org.codehaus.jackson.JsonNode;
 import org.junit.Test;
 
-import ants.ObjectFactory;
 import ants.ParamsDefault;
-import ants.api.IParams.Type;
-import ants.api.ContextModule;
+import ants.core.ContextModule;
+import ants.core.ObjectFactory;
+import ants.core.IParams.Type;
 import ants.exception.ObjectConfigureException;
 import ants.exception.EvaluateException;
 import ants.exception.ParseException;

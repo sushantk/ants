@@ -1,4 +1,4 @@
-package ants.api;
+package ants.core;
 
 public interface IModule {
 

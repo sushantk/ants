@@ -1,4 +1,4 @@
-package ants.api;
+package ants.core;
 
 import ants.exception.ObjectConfigureException;
 import ants.exception.ParseException;

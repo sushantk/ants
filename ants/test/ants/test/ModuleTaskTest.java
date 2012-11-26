@@ -4,9 +4,9 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import ants.api.Data;
-import ants.api.TaskModule;
-import ants.api.Task;
+import ants.core.Data;
+import ants.core.Task;
+import ants.ext.TaskModule;
 import ants.test.stub.TestModuleContext;
 import ants.test.stub.TestModule;
 import ants.test.stub.TestObjectFactory;

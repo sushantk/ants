@@ -1,7 +1,10 @@
-package ants.api;
+package ants.ext;
 
 import java.util.Collection;
 import java.util.Collections;
+
+import ants.core.Data;
+import ants.core.Task;
 
 /**
  * A dummy task that can respond to the run method with an 
