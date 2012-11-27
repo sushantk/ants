@@ -1,11 +1,14 @@
 {
-    "fetcher": {
+    // A very simple module definition with a single argument "string"
+    "module": {
         "@class": "ants.FetcherEcho",
-        "string": "Hello World"
+        "string": ""
     }
 
-    "module": {
-        "fetcher": {
+    // Using the above module in some other module
+    "demo": {
+        "@class": "example"
+        "child": {
             "id": "echo",
             "params": {
                 "string": "Hello World"
